@@ -14,7 +14,7 @@ import {
 import {
   APIComponent,
   ButtonStyle,
-  ButtonType,
+  ComponentType,
 } from "../interfaces/interactions";
 import { FireTextChannel } from "@fire/lib/extensions/textchannel";
 import { FireMember } from "@fire/lib/extensions/guildmember";
@@ -385,7 +385,7 @@ export class PaginatorInterface {
         {
           style: ButtonStyle.DESTRUCTIVE,
           custom_id: "close",
-          type: ButtonType.BUTTON,
+          type: ComponentType.BUTTON,
           emoji: { id: "835140711489863701" },
         },
       ];
@@ -395,34 +395,34 @@ export class PaginatorInterface {
           emoji: { id: "835140711606124574" },
           disabled: this.displayPage == 0,
           style: ButtonStyle.PRIMARY,
-          type: ButtonType.BUTTON,
+          type: ComponentType.BUTTON,
           custom_id: "start",
         },
         {
           emoji: { id: "835140710982352907" },
           disabled: this.displayPage == 0,
           style: ButtonStyle.PRIMARY,
-          type: ButtonType.BUTTON,
+          type: ComponentType.BUTTON,
           custom_id: "back",
         },
         {
           emoji: { id: "835140711489863701" },
           style: ButtonStyle.DESTRUCTIVE,
-          type: ButtonType.BUTTON,
+          type: ComponentType.BUTTON,
           custom_id: "close",
         },
         {
           disabled: this.displayPage == this.pageCount - 1,
           emoji: { id: "835140711476494346" },
           style: ButtonStyle.PRIMARY,
-          type: ButtonType.BUTTON,
+          type: ComponentType.BUTTON,
           custom_id: "forward",
         },
         {
           disabled: this.displayPage == this.pageCount - 1,
           emoji: { id: "835140711388676116" },
           style: ButtonStyle.PRIMARY,
-          type: ButtonType.BUTTON,
+          type: ComponentType.BUTTON,
           custom_id: "end",
         },
       ];

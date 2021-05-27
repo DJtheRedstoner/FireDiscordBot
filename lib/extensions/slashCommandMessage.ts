@@ -31,7 +31,7 @@ import {
 } from "discord.js";
 import {
   APIComponent,
-  ButtonType,
+  ComponentType,
   ActionRow,
 } from "@fire/lib/interfaces/interactions";
 import { APIMessage as DiscordAPIMessage } from "discord-api-types";
@@ -326,18 +326,18 @@ export class SlashCommandMessage {
     const isRow =
       options?.buttons?.length &&
       options?.buttons.every(
-        (component) => component.type == ButtonType.ACTION_ROW
+        (component) => component.type == ComponentType.ACTION_ROW
       );
     const isButtons =
       options?.buttons?.length &&
       options?.buttons.every(
-        (component) => component.type == ButtonType.BUTTON
+        (component) => component.type == ComponentType.BUTTON
       );
 
     if (isRow) data.components = options.buttons;
     else if (isButtons)
       data.components = [
-        { type: ButtonType.ACTION_ROW, components: options.buttons },
+        { type: ComponentType.ACTION_ROW, components: options.buttons },
       ];
     else if (options?.buttons == null) data.components = [];
 
@@ -509,12 +509,12 @@ export class FakeChannel {
     const isRow =
       options?.buttons?.length &&
       options?.buttons.every(
-        (component) => component.type == ButtonType.ACTION_ROW
+        (component) => component.type == ComponentType.ACTION_ROW
       );
     const isButtons =
       options?.buttons?.length &&
       options?.buttons.every(
-        (component) => component.type == ButtonType.BUTTON
+        (component) => component.type == ComponentType.BUTTON
       );
 
     if (isRow) data.components = options.buttons;

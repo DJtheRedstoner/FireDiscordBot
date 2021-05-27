@@ -28,7 +28,7 @@ import {
 import {
   APIComponent,
   Interaction,
-  ButtonType,
+  ComponentType,
   Button,
   ActionRow,
 } from "../interfaces/interactions";
@@ -92,7 +92,7 @@ export class ButtonMessage {
             (component.type == this.button.data.component_type &&
               // @ts-ignore
               component.custom_id == this.custom_id) ||
-            (component.type == ButtonType.ACTION_ROW &&
+            (component.type == ComponentType.ACTION_ROW &&
               component.components.find(
                 (component) =>
                   component.type == this.button.data.component_type &&
@@ -168,18 +168,18 @@ export class ButtonMessage {
     const isRow =
       options?.buttons?.length &&
       options?.buttons.every(
-        (component) => component.type == ButtonType.ACTION_ROW
+        (component) => component.type == ComponentType.ACTION_ROW
       );
     const isButtons =
       options?.buttons?.length &&
       options?.buttons.every(
-        (component) => component.type == ButtonType.BUTTON
+        (component) => component.type == ComponentType.BUTTON
       );
 
     if (isRow) data.components = options.buttons;
     else if (isButtons)
       data.components = [
-        { type: ButtonType.ACTION_ROW, components: options.buttons },
+        { type: ComponentType.ACTION_ROW, components: options.buttons },
       ];
 
     return await (channel.client as Fire).req
@@ -227,12 +227,12 @@ export class ButtonMessage {
     const isRow =
       options?.buttons?.length &&
       options?.buttons.every(
-        (component) => component.type == ButtonType.ACTION_ROW
+        (component) => component.type == ComponentType.ACTION_ROW
       );
     const isButtons =
       options?.buttons?.length &&
       options?.buttons.every(
-        (component) => component.type == ButtonType.BUTTON
+        (component) => component.type == ComponentType.BUTTON
       );
 
     if (isRow) data.components = options.buttons;
@@ -381,12 +381,12 @@ export class ButtonMessage {
     const isRow =
       options?.buttons?.length &&
       options?.buttons.every(
-        (component) => component.type == ButtonType.ACTION_ROW
+        (component) => component.type == ComponentType.ACTION_ROW
       );
     const isButtons =
       options?.buttons?.length &&
       options?.buttons.every(
-        (component) => component.type == ButtonType.BUTTON
+        (component) => component.type == ComponentType.BUTTON
       );
 
     if (isRow) data.components = options.buttons;
@@ -550,18 +550,18 @@ export class FakeChannel {
     const isRow =
       options?.buttons?.length &&
       options?.buttons.every(
-        (component) => component.type == ButtonType.ACTION_ROW
+        (component) => component.type == ComponentType.ACTION_ROW
       );
     const isButtons =
       options?.buttons?.length &&
       options?.buttons.every(
-        (component) => component.type == ButtonType.BUTTON
+        (component) => component.type == ComponentType.BUTTON
       );
 
     if (isRow) data.components = options.buttons;
     else if (isButtons)
       data.components = [
-        { type: ButtonType.ACTION_ROW, components: options.buttons },
+        { type: ComponentType.ACTION_ROW, components: options.buttons },
       ];
 
     data.flags = this.flags;
@@ -642,18 +642,18 @@ export class FakeChannel {
     const isRow =
       options?.buttons?.length &&
       options?.buttons.every(
-        (component) => component.type == ButtonType.ACTION_ROW
+        (component) => component.type == ComponentType.ACTION_ROW
       );
     const isButtons =
       options?.buttons?.length &&
       options?.buttons.every(
-        (component) => component.type == ButtonType.BUTTON
+        (component) => component.type == ComponentType.BUTTON
       );
 
     if (isRow) data.components = options.buttons;
     else if (isButtons)
       data.components = [
-        { type: ButtonType.ACTION_ROW, components: options.buttons },
+        { type: ComponentType.ACTION_ROW, components: options.buttons },
       ];
     else if (options?.buttons == null) data.components = [];
 

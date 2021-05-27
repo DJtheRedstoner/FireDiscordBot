@@ -21,7 +21,7 @@ import {
   MemberLogType,
   ModLogType,
 } from "@fire/lib/util/constants";
-import { ButtonStyle, ButtonType } from "../interfaces/interactions";
+import { ButtonStyle, ComponentType } from "../interfaces/interactions";
 import { GuildTagManager } from "@fire/lib/util/guildtagmanager";
 import { ReactionRoleData } from "@fire/lib/interfaces/rero";
 import TicketName from "@fire/src/commands/Tickets/name";
@@ -850,7 +850,7 @@ export class FireGuild extends Guild {
           embed,
           buttons: [
             {
-              type: ButtonType.BUTTON,
+              type: ComponentType.BUTTON,
               style: ButtonStyle.DESTRUCTIVE,
               custom_id: `ticket_close_${ticket.id}`,
               label: this.language.get("TICKET_CLOSE_BUTTON_TEXT") as string,

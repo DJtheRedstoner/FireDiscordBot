@@ -131,13 +131,14 @@ export enum ButtonStyle {
   LINK,
 }
 
-export enum ButtonType {
+export enum ComponentType {
   ACTION_ROW = 1,
   BUTTON,
+  SELECT,
 }
 
 export type ActionRow = {
-  type: ButtonType.ACTION_ROW;
+  type: ComponentType.ACTION_ROW;
   components: APIComponent[];
 };
 
@@ -150,7 +151,7 @@ export type APIComponent =
   // interaction button with label
   | {
       style: Exclude<ButtonStyle, "LINK">;
-      type: ButtonType.BUTTON;
+      type: ComponentType.BUTTON;
       emoji?: ButtonEmoji;
       disabled?: boolean;
       custom_id: string;
@@ -159,7 +160,7 @@ export type APIComponent =
   // interaction button with emoji
   | {
       style: Exclude<ButtonStyle, "LINK">;
-      type: ButtonType.BUTTON;
+      type: ComponentType.BUTTON;
       disabled?: boolean;
       emoji: ButtonEmoji;
       custom_id: string;
@@ -168,7 +169,7 @@ export type APIComponent =
   // interaction button with label and emoji
   | {
       style: Exclude<ButtonStyle, "LINK">;
-      type: ButtonType.BUTTON;
+      type: ComponentType.BUTTON;
       disabled?: boolean;
       emoji: ButtonEmoji;
       custom_id: string;
@@ -176,7 +177,7 @@ export type APIComponent =
     }
   // link button with label
   | {
-      type: ButtonType.BUTTON;
+      type: ComponentType.BUTTON;
       style: ButtonStyle.LINK;
       disabled?: boolean;
       label: string;
@@ -184,7 +185,7 @@ export type APIComponent =
     }
   // link button with emoji
   | {
-      type: ButtonType.BUTTON;
+      type: ComponentType.BUTTON;
       style: ButtonStyle.LINK;
       disabled?: boolean;
       emoji: ButtonEmoji;
@@ -192,7 +193,7 @@ export type APIComponent =
     }
   // link button with label and emoji
   | {
-      type: ButtonType.BUTTON;
+      type: ComponentType.BUTTON;
       style: ButtonStyle.LINK;
       disabled?: boolean;
       emoji: ButtonEmoji;
@@ -200,6 +201,6 @@ export type APIComponent =
       url: string;
     }
   | {
-      type: ButtonType.ACTION_ROW;
+      type: ComponentType.ACTION_ROW;
       components: APIComponent[];
     };

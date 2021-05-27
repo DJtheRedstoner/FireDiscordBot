@@ -14,7 +14,7 @@ import { Command } from "@fire/lib/util/command";
 import {
   APIComponent,
   ButtonStyle,
-  ButtonType,
+  ComponentType,
 } from "@fire/lib/interfaces/interactions";
 
 const userMentionRegex = /<@!?(\d{15,21})>$/im;
@@ -120,13 +120,13 @@ export default class Help extends Command {
       }
       buttons = [
         {
-          type: ButtonType.BUTTON,
+          type: ComponentType.BUTTON,
           style: ButtonStyle.LINK,
           url: "https://inv.wtf/",
           label: "Website",
         },
         {
-          type: ButtonType.BUTTON,
+          type: ComponentType.BUTTON,
           style: ButtonStyle.LINK,
           // right now this opens in browser but
           // I have been told this may change
@@ -136,18 +136,18 @@ export default class Help extends Command {
         {
           url: "https://inv.wtf/terms",
           label: "Terms of Service",
-          type: ButtonType.BUTTON,
+          type: ComponentType.BUTTON,
           style: ButtonStyle.LINK,
         },
         {
           url: "https://inv.wtf/privacy",
-          type: ButtonType.BUTTON,
+          type: ComponentType.BUTTON,
           style: ButtonStyle.LINK,
           label: "Privacy Policy",
         },
         {
           url: "https://inv.wtf/premium",
-          type: ButtonType.BUTTON,
+          type: ComponentType.BUTTON,
           style: ButtonStyle.LINK,
           label: "Premium",
         },

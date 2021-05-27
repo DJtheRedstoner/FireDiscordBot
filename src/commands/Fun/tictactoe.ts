@@ -2,7 +2,7 @@ import {
   ActionRow,
   APIComponent,
   ButtonStyle,
-  ButtonType,
+  ComponentType,
 } from "@fire/lib/interfaces/interactions";
 import { SlashCommandMessage } from "@fire/lib/extensions/slashCommandMessage";
 import { ButtonMessage } from "@fire/lib/extensions/buttonMessage";
@@ -82,7 +82,7 @@ export default class TicTacToe extends Command {
             "TICTACTOE_ACCEPT_CHALLENGE"
           ) as string,
           style: ButtonStyle.SUCCESS,
-          type: ButtonType.BUTTON,
+          type: ComponentType.BUTTON,
           custom_id: requestId,
         },
       ] as APIComponent[], // tsc complains without this for some reason
@@ -172,46 +172,46 @@ export default class TicTacToe extends Command {
 
     const buttons = [
       {
-        type: ButtonType.ACTION_ROW,
+        type: ComponentType.ACTION_ROW,
         components: [1, 2, 3].map((pos) => {
           return {
             custom_id: "!" + gameData.buttons[pos].custom_id,
             style: ButtonStyle.SECONDARY,
-            type: ButtonType.BUTTON,
+            type: ComponentType.BUTTON,
             emoji: { id: "842914636026216498" },
           };
         }),
       },
       {
-        type: ButtonType.ACTION_ROW,
+        type: ComponentType.ACTION_ROW,
         components: [4, 5, 6].map((pos) => {
           return {
             custom_id: "!" + gameData.buttons[pos].custom_id,
             style: ButtonStyle.SECONDARY,
-            type: ButtonType.BUTTON,
+            type: ComponentType.BUTTON,
             emoji: { id: "842914636026216498" },
           };
         }),
       },
       {
-        type: ButtonType.ACTION_ROW,
+        type: ComponentType.ACTION_ROW,
         components: [7, 8, 9].map((pos) => {
           return {
             custom_id: "!" + gameData.buttons[pos].custom_id,
             style: ButtonStyle.SECONDARY,
-            type: ButtonType.BUTTON,
+            type: ComponentType.BUTTON,
             emoji: { id: "842914636026216498" },
           };
         }),
       },
       {
-        type: ButtonType.ACTION_ROW,
+        type: ComponentType.ACTION_ROW,
         components: [
           {
             label: message.guild.language.get("TICTACTOE_FORFEIT"),
             custom_id: `!${gameId}:forfeit`,
             style: ButtonStyle.PRIMARY,
-            type: ButtonType.BUTTON,
+            type: ComponentType.BUTTON,
           },
         ],
       },
@@ -303,17 +303,17 @@ export default class TicTacToe extends Command {
       const components = buttonMessage.components as ActionRow[];
       const actionRowIndex = components.findIndex(
         (component) =>
-          component.type == ButtonType.ACTION_ROW &&
+          component.type == ComponentType.ACTION_ROW &&
           component.components.find(
             (component) =>
-              component.type == ButtonType.BUTTON &&
+              component.type == ComponentType.BUTTON &&
               component.style != ButtonStyle.LINK &&
               component.custom_id == "!" + buttonId
           )
       );
       const buttonIndex = components[actionRowIndex].components.findIndex(
         (component) =>
-          component.type == ButtonType.BUTTON &&
+          component.type == ComponentType.BUTTON &&
           component.style != ButtonStyle.LINK &&
           component.custom_id == "!" + buttonId
       );
@@ -351,23 +351,23 @@ export default class TicTacToe extends Command {
         for (const index of state) {
           const actionRowIndex = components.findIndex(
             (component) =>
-              component.type == ButtonType.ACTION_ROW &&
+              component.type == ComponentType.ACTION_ROW &&
               component.components.find(
                 (component) =>
-                  component.type == ButtonType.BUTTON &&
+                  component.type == ComponentType.BUTTON &&
                   component.style != ButtonStyle.LINK &&
                   component.custom_id == game.buttons[index].custom_id
               )
           );
           const buttonIndex = components[actionRowIndex].components.findIndex(
             (component) =>
-              component.type == ButtonType.BUTTON &&
+              component.type == ComponentType.BUTTON &&
               component.style != ButtonStyle.LINK &&
               component.custom_id == game.buttons[index].custom_id
           );
           if (
             components[actionRowIndex].components[buttonIndex].type ==
-            ButtonType.BUTTON
+            ComponentType.BUTTON
           )
             (components[actionRowIndex].components[buttonIndex] as {
               style: ButtonStyle;
@@ -376,7 +376,7 @@ export default class TicTacToe extends Command {
 
         for (const [index, row] of components.entries()) {
           row.components = row.components.map((component) => {
-            if (component.type == ButtonType.ACTION_ROW) return component;
+            if (component.type == ComponentType.ACTION_ROW) return component;
             component.disabled = true;
             return component;
           });
@@ -408,7 +408,7 @@ export default class TicTacToe extends Command {
 
         for (const [index, row] of components.entries()) {
           row.components = row.components.map((component) => {
-            if (component.type == ButtonType.ACTION_ROW) return component;
+            if (component.type == ComponentType.ACTION_ROW) return component;
             component.disabled = true;
             return component;
           });

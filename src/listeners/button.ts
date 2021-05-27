@@ -5,7 +5,7 @@ import {
 import {
   APIComponent,
   ButtonStyle,
-  ButtonType,
+  ComponentType,
 } from "@fire/lib/interfaces/interactions";
 import { SnowflakeUtil, MessageEmbed, Permissions } from "discord.js";
 import { FireTextChannel } from "@fire/lib/extensions/textchannel";
@@ -232,7 +232,7 @@ export default class Button extends Listener {
             label: button.language.get("TAG_EDIT_CANCEL_BUTTON") as string,
             style: ButtonStyle.DESTRUCTIVE,
             custom_id: cancelSnowflake,
-            type: ButtonType.BUTTON,
+            type: ComponentType.BUTTON,
           },
         ],
       });
@@ -340,20 +340,20 @@ export default class Button extends Listener {
       if (!message) return "no message";
       const component = message.components
         ?.map((component) =>
-          component.type == ButtonType.ACTION_ROW
+          component.type == ComponentType.ACTION_ROW
             ? component?.components ?? component
             : component
         )
         .flat()
         .find(
           (component) =>
-            component.type == ButtonType.BUTTON &&
+            component.type == ComponentType.BUTTON &&
             component.style != ButtonStyle.LINK &&
             (component.custom_id == button.custom_id ||
               component.custom_id.slice(1) == button.custom_id)
         );
       if (
-        component?.type != ButtonType.BUTTON ||
+        component?.type != ComponentType.BUTTON ||
         component?.style == ButtonStyle.LINK
       )
         return "non button";
@@ -364,7 +364,7 @@ export default class Button extends Listener {
       const confirmButton: APIComponent = {
         custom_id: `sk1er_confirm_${type}`,
         style: ButtonStyle.SUCCESS,
-        type: ButtonType.BUTTON,
+        type: ComponentType.BUTTON,
         emoji: { name: emoji },
         disabled: true,
       };
@@ -372,7 +372,7 @@ export default class Button extends Listener {
       const deleteButton: APIComponent = {
         emoji: { id: "534174796938870792" },
         style: ButtonStyle.DESTRUCTIVE,
-        type: ButtonType.BUTTON,
+        type: ComponentType.BUTTON,
         custom_id: deleteSnowflake,
       };
       this.client.buttonHandlersOnce.set(deleteSnowflake, () => {
@@ -409,12 +409,12 @@ export default class Button extends Listener {
         components: APIComponent[];
       }).components = [
         {
-          type: ButtonType.ACTION_ROW,
+          type: ComponentType.ACTION_ROW,
           components: [
             {
               custom_id: `sk1er_confirm_${type}`,
               style: ButtonStyle.SUCCESS,
-              type: ButtonType.BUTTON,
+              type: ComponentType.BUTTON,
               emoji: { name: sk1erTypeToEmoji[type] },
             },
           ],

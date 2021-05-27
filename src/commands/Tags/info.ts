@@ -2,7 +2,7 @@ import {
   ActionRow,
   APIComponent,
   ButtonStyle,
-  ButtonType,
+  ComponentType,
 } from "@fire/lib/interfaces/interactions";
 import { ButtonMessage } from "@fire/lib/extensions/buttonMessage";
 import { FireMessage } from "@fire/lib/extensions/message";
@@ -88,21 +88,21 @@ export default class TagInfo extends Command {
         label: message.language.get("TAG_INFO_EDIT_BUTTON") as string,
         custom_id: `!tag_edit:${tag.name}`,
         style: ButtonStyle.PRIMARY,
-        type: ButtonType.BUTTON,
+        type: ComponentType.BUTTON,
       },
       tag.content.length >= 100
         ? {
             label: message.language.get("TAG_INFO_VIEW_BUTTON") as string,
             custom_id: `tag_view:${tag.name}`,
             style: ButtonStyle.PRIMARY,
-            type: ButtonType.BUTTON,
+            type: ComponentType.BUTTON,
           }
         : null,
       {
         label: message.language.get("TAG_INFO_DELETE_BUTTON") as string,
         custom_id: `!tag_delete:${tag.name}`,
         style: ButtonStyle.DESTRUCTIVE,
-        type: ButtonType.BUTTON,
+        type: ComponentType.BUTTON,
       },
     ].filter((component) => !!component) as APIComponent[];
   }

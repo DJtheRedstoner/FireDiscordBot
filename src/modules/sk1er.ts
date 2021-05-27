@@ -1,4 +1,4 @@
-import { ButtonStyle, ButtonType } from "@fire/lib/interfaces/interactions";
+import { ButtonStyle, ComponentType } from "@fire/lib/interfaces/interactions";
 import { CategoryChannel, MessageReaction, Role } from "discord.js";
 import { FireTextChannel } from "@fire/lib/extensions/textchannel";
 import { ButtonMessage } from "@fire/lib/extensions/buttonMessage";
@@ -231,19 +231,19 @@ export default class Sk1er extends Module {
       if (!trigger.message) return "no message";
       const component = (trigger.message as FireMessage).components
         .map((component) =>
-          component.type == ButtonType.ACTION_ROW
+          component.type == ComponentType.ACTION_ROW
             ? component?.components ?? component
             : component
         )
         .flat()
         .find(
           (component) =>
-            component.type == ButtonType.BUTTON &&
+            component.type == ComponentType.BUTTON &&
             component.style != ButtonStyle.LINK &&
             component.custom_id == trigger.custom_id
         );
       if (
-        component.type != ButtonType.BUTTON ||
+        component.type != ComponentType.BUTTON ||
         component.style == ButtonStyle.LINK
       )
         return "non button";

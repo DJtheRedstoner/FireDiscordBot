@@ -2,7 +2,7 @@ import { SlashCommandMessage } from "@fire/lib/extensions/slashCommandMessage";
 import {
   APIComponent,
   ButtonStyle,
-  ButtonType,
+  ComponentType,
 } from "@fire/lib/interfaces/interactions";
 import { ButtonMessage } from "@fire/lib/extensions/buttonMessage";
 import { FireMember } from "@fire/lib/extensions/guildmember";
@@ -133,7 +133,7 @@ export default class Rank extends Command {
       guild.settings.set<string[]>("utils.ranks", roles);
     if (!roles.length) return [];
     roles = roles.map((id) => guild.roles.cache.get(id) as Role);
-    const components = [{ type: ButtonType.ACTION_ROW, components: [] }];
+    const components = [{ type: ComponentType.ACTION_ROW, components: [] }];
     for (const role of roles) {
       let name = "@" + role.name;
       let emoji: string;
@@ -147,9 +147,9 @@ export default class Rank extends Command {
         components[components.length - 1].components.length >= 5 &&
         components.length < 5
       )
-        components.push({ type: ButtonType.ACTION_ROW, components: [] });
+        components.push({ type: ComponentType.ACTION_ROW, components: [] });
       components[components.length - 1].components.push({
-        type: ButtonType.BUTTON,
+        type: ComponentType.BUTTON,
         style: useState
           ? member.roles.cache.has(role.id)
             ? ButtonStyle.DESTRUCTIVE

@@ -1,7 +1,7 @@
 import {
   APIComponent,
   ButtonStyle,
-  ButtonType,
+  ComponentType,
 } from "@fire/lib/interfaces/interactions";
 import {
   MessageAdditions,
@@ -51,7 +51,7 @@ export default class CloseTicket extends Command {
     const buttonOptions = {
       buttons: [
         {
-          type: ButtonType.BUTTON,
+          type: ComponentType.BUTTON,
           style: ButtonStyle.DESTRUCTIVE,
           custom_id: buttonSnowflake,
           label: message.language.get("TICKET_CLOSE_BUTTON_TEXT") as string,
