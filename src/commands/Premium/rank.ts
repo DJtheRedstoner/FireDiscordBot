@@ -1,6 +1,7 @@
 import { SlashCommandMessage } from "@fire/lib/extensions/slashcommandmessage";
 import {
   APIComponent,
+  APIComponentSelect,
   ButtonStyle,
   ComponentType,
 } from "@fire/lib/interfaces/interactions";
@@ -85,19 +86,29 @@ export default class Rank extends Command {
               }) as string)
             : undefined
         );
-      if (!message.guild.hasExperiment(1621199146, 1))
-        return await message.channel.send(embed);
-      else delete embed.description;
-      const components = Rank.getRankButtons(
-        message.guild,
-        message.member
-        // message instanceof FireMessage
-      );
-      return message instanceof SlashCommandMessage
-        ? message.channel.send(embed, { components: components as APIComponent[] })
-        : await ComponentMessage.sendWithComponents(message.channel, embed, {
-            components: components as APIComponent[],
-          });
+      // use buttons only for a single row
+      if (message.guild.hasExperiment(1621199146, 1) && roles.length <= 5) {
+        delete embed.description;
+        const components = Rank.getRankButtons(message.guild, message.member);
+        return message instanceof SlashCommandMessage
+          ? message.channel.send(embed, {
+              components: components as APIComponent[],
+            })
+          : await ComponentMessage.sendWithComponents(message.channel, embed, {
+              components: components as APIComponent[],
+            });
+        // use dropdowns if enabled & there's more than 5 ranks
+      } else if (message.guild.hasExperiment(1685450372, 1)) {
+        delete embed.description;
+        const dropdown = Rank.getRankDropdown(message.guild);
+        return message instanceof SlashCommandMessage
+          ? message.channel.send(embed, {
+              components: dropdown,
+            })
+          : await ComponentMessage.sendWithComponents(message.channel, embed, {
+              components: dropdown,
+            });
+      } else return await message.channel.send(embed);
     }
 
     if (roles.includes(args.role)) {
@@ -161,5 +172,46 @@ export default class Rank extends Command {
       });
     }
     return components;
+  }
+
+  static getRankDropdown(guild: FireGuild) {
+    let roles: string[] | Role[] = guild.settings
+      .get<string[]>("utils.ranks", [])
+      .filter((id) => guild.roles.cache.has(id));
+    if (guild.settings.get<string[]>("utils.ranks", []) != roles)
+      guild.settings.set<string[]>("utils.ranks", roles);
+    if (!roles.length) return [];
+    roles = roles.map((id) => guild.roles.cache.get(id) as Role);
+    const dropdown = {
+      placeholder: guild.language.get("RANKS_SELECT_PLACEHOLDER"),
+      custom_id: `!rank:${guild.id}`,
+      type: ComponentType.SELECT,
+      max_values: roles.length,
+      min_values: 1,
+      options: [],
+    } as APIComponentSelect;
+    for (const role of roles) {
+      if (dropdown.options.length >= 25) break;
+      let name = "@" + role.name;
+      let emoji: string;
+      const hasEmoji = unicodeEmoji.exec(role.name);
+      unicodeEmoji.lastIndex = 0;
+      if (hasEmoji?.length && role.name.startsWith(hasEmoji[0])) {
+        emoji = hasEmoji[0];
+        name = "@" + role.name.slice(hasEmoji[0].length).trim();
+      }
+      dropdown.options.push({
+        emoji: emoji ? { name: emoji } : null,
+        default: false,
+        value: role.id,
+        label: name,
+      });
+    }
+    return guild.client.util.validateComponents([
+      {
+        type: ComponentType.ACTION_ROW,
+        components: [dropdown],
+      },
+    ]);
   }
 }
