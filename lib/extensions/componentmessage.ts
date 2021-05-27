@@ -55,6 +55,7 @@ export class ComponentMessage {
   private _flags: number;
   latestResponse: string;
   channel: FakeChannel;
+  type: ComponentType;
   ephemeral: boolean;
   member: FireMember;
   language: Language;
@@ -70,6 +71,7 @@ export class ComponentMessage {
     this.client = client;
     this.id = interaction.id;
     this.snowflake = SnowflakeUtil.deconstruct(this.id);
+    this.type = interaction.data.component_type;
     this.custom_id = interaction.data.custom_id;
     this.interaction = interaction;
     this.sent = false;
@@ -168,7 +170,9 @@ export class ComponentMessage {
       files: any[];
     };
 
-    data.components = (channel.client as Fire).util.validateComponents(options.components)
+    data.components = (channel.client as Fire).util.validateComponents(
+      options.components
+    );
 
     return await (channel.client as Fire).req
       .channels(channel.id)
@@ -212,7 +216,9 @@ export class ComponentMessage {
       files: any[];
     };
 
-    data.components = message.client.util.validateComponents(options.components)
+    data.components = message.client.util.validateComponents(
+      options.components
+    );
 
     return await (message.client as Fire).req
       .channels(message.channel.id)
@@ -352,7 +358,7 @@ export class ComponentMessage {
 
     data.flags = this.flags;
 
-    data.components = this.client.util.validateComponents(options.components)
+    data.components = this.client.util.validateComponents(options.components);
 
     await this.client.req
       .webhooks(this.client.user.id, this.interaction.token)
@@ -507,7 +513,7 @@ export class FakeChannel {
       files: any[];
     };
 
-    data.components = this.client.util.validateComponents(options.components)
+    data.components = this.client.util.validateComponents(options.components);
 
     data.flags = this.flags;
     if (typeof flags == "number") data.flags = flags;
@@ -584,7 +590,7 @@ export class FakeChannel {
       files: any[];
     };
 
-    data.components = this.client.util.validateComponents(options.components)
+    data.components = this.client.util.validateComponents(options.components);
 
     data.flags = this.flags;
     if (typeof flags == "number") data.flags = flags;
