@@ -156,70 +156,74 @@ export type SelectOption = {
   value: string;
 };
 
+export interface APIComponentSelect {
+  type: ComponentType.SELECT;
+  options: SelectOption[];
+  placeholder: string;
+  disabled?: boolean; // doesn't seem to affect dropdowns but tsc complains without
+  custom_id: string;
+  min_values: number;
+  max_values: number;
+}
+
 export type APIComponent =
-  // interaction button with label
-  | {
-      style: Exclude<ButtonStyle, "LINK">;
-      type: ComponentType.BUTTON;
-      emoji?: ButtonEmoji;
-      disabled?: boolean;
-      custom_id: string;
-      label: string;
-    }
-  // interaction button with emoji
-  | {
-      style: Exclude<ButtonStyle, "LINK">;
-      type: ComponentType.BUTTON;
-      disabled?: boolean;
-      emoji: ButtonEmoji;
-      custom_id: string;
-      label?: string;
-    }
-  // interaction button with label and emoji
-  | {
-      style: Exclude<ButtonStyle, "LINK">;
-      type: ComponentType.BUTTON;
-      disabled?: boolean;
-      emoji: ButtonEmoji;
-      custom_id: string;
-      label: string;
-    }
-  // link button with label
-  | {
-      type: ComponentType.BUTTON;
-      style: ButtonStyle.LINK;
-      disabled?: boolean;
-      label: string;
-      url: string;
-    }
-  // link button with emoji
-  | {
-      type: ComponentType.BUTTON;
-      style: ButtonStyle.LINK;
-      disabled?: boolean;
-      emoji: ButtonEmoji;
-      url: string;
-    }
-  // link button with label and emoji
-  | {
-      type: ComponentType.BUTTON;
-      style: ButtonStyle.LINK;
-      disabled?: boolean;
-      emoji: ButtonEmoji;
-      label: string;
-      url: string;
-    }
-  // Dropdown
-  | {
-      type: ComponentType.SELECT;
-      options: SelectOption[];
-      placeholder: string;
-      disabled?: boolean; // doesn't seem to affect dropdowns but tsc complains without
-      custom_id: string;
-      min_values?: number;
-      max_values?: number;
-    }
-  | {
-      type: ComponentType.ACTION_ROW;
-      components: APIComponent[];
-    };
+  | InteractionButtonWithLabel
+  | InteractionButtonWithEmoji
+  | InteractionButtonWithLabelAndEmoji
+  | LinkButtonWithLabel
+  | LinkButtonWithEmoji
+  | LinkButtonWithLabelAndEmoji
+  | APIComponentSelect
+  | ActionRow;
+
+interface InteractionButtonWithLabel {
+  style: Exclude<ButtonStyle, "LINK">;
+  type: ComponentType.BUTTON;
+  emoji?: ButtonEmoji;
+  disabled?: boolean;
+  custom_id: string;
+  label: string;
+}
+
+interface InteractionButtonWithEmoji {
+  style: Exclude<ButtonStyle, "LINK">;
+  type: ComponentType.BUTTON;
+  disabled?: boolean;
+  emoji: ButtonEmoji;
+  custom_id: string;
+  label?: string;
+}
+
+interface InteractionButtonWithLabelAndEmoji {
+  style: Exclude<ButtonStyle, "LINK">;
+  type: ComponentType.BUTTON;
+  disabled?: boolean;
+  emoji: ButtonEmoji;
+  custom_id: string;
+  label: string;
+}
+
+interface LinkButtonWithLabel {
+  type: ComponentType.BUTTON;
+  style: ButtonStyle.LINK;
+  disabled?: boolean;
+  label: string;
+  url: string;
+}
+
+interface LinkButtonWithEmoji {
+  type: ComponentType.BUTTON;
+  style: ButtonStyle.LINK;
+  disabled?: boolean;
+  emoji: ButtonEmoji;
+  url: string;
+}
+
+interface LinkButtonWithLabelAndEmoji {
+  type: ComponentType.BUTTON;
+  style: ButtonStyle.LINK;
+  disabled?: boolean;
+  emoji: ButtonEmoji;
+  label: string;
+  url: string;
+}
