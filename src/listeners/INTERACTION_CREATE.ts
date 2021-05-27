@@ -1,7 +1,11 @@
 // The case of the file name is just to signify that
 // this is listening to an event directly from the gateway
 
-import { ComponentInteraction, Interaction } from "@fire/lib/interfaces/interactions";
+import {
+  ComponentInteraction,
+  ComponentType,
+  Interaction,
+} from "@fire/lib/interfaces/interactions";
 import { ComponentMessage } from "@fire/lib/extensions/componentmessage";
 import { FireGuild } from "@fire/lib/extensions/guild";
 import { constants } from "@fire/lib/util/constants";
@@ -23,7 +27,8 @@ export default class InteractionCreate extends Listener {
     if (this.blacklistCheck(interaction)) return;
     // slash command, use client interaction event
     else if (interaction.type == 2) return;
-    else if (interaction.type == 3) return await this.handleComponent(interaction);
+    else if (interaction.type == 3)
+      return await this.handleComponent(interaction);
     else {
       const haste = await this.client.util.haste(
         JSON.stringify(interaction, null, 4),
@@ -41,17 +46,20 @@ export default class InteractionCreate extends Listener {
     }
   }
 
-  async handleComponent(button: ComponentInteraction) {
+  async handleComponent(component: ComponentInteraction) {
     try {
       // should be cached if in guild or fetch if dm channel
-      await this.client.channels.fetch(button.channel_id).catch(() => {});
-      const message = new ComponentMessage(this.client, button);
+      await this.client.channels.fetch(component.channel_id).catch(() => {});
+      const message = new ComponentMessage(this.client, component);
       if (!message.custom_id.startsWith("!")) await message.channel.ack();
       else message.custom_id = message.custom_id.slice(1);
-      this.client.emit("button", message);
+      if (message.type == ComponentType.BUTTON)
+        this.client.emit("button", message);
+      else if (message.type == ComponentType.SELECT)
+        this.client.emit("dropdown", message);
     } catch (error) {
-      await this.callbackError(button, error).catch(
-        async () => await this.webhookError(button, error).catch(() => {})
+      await this.callbackError(component, error).catch(
+        async () => await this.webhookError(component, error).catch(() => {})
       );
       if (
         typeof this.client.sentry != "undefined" &&
@@ -59,12 +67,12 @@ export default class InteractionCreate extends Listener {
       ) {
         const sentry = this.client.sentry;
         sentry.setExtras({
-          button: JSON.stringify(button.data),
-          member: button.member
-            ? `${button.member.user.username}#${button.member.user.discriminator}`
-            : `${button.user.username}#${button.user.discriminator}`,
-          channel_id: button.channel_id,
-          guild_id: button.guild_id,
+          component: JSON.stringify(component.data),
+          member: component.member
+            ? `${component.member.user.username}#${component.member.user.discriminator}`
+            : `${component.user.username}#${component.user.discriminator}`,
+          channel_id: component.channel_id,
+          guild_id: component.guild_id,
           env: process.env.NODE_ENV,
         });
         sentry.captureException(error);
