@@ -147,6 +147,14 @@ export type ButtonEmoji = {
   name?: string;
 };
 
+export type SelectOption = {
+  description?: string;
+  emoji?: ButtonEmoji;
+  default: boolean;
+  label: string;
+  value: string;
+};
+
 export type APIComponent =
   // interaction button with label
   | {
@@ -199,6 +207,13 @@ export type APIComponent =
       emoji: ButtonEmoji;
       label: string;
       url: string;
+    }
+  // Dropdown
+  | {
+      type: ComponentType.SELECT;
+      options: SelectOption[];
+      placeholder: string;
+      custom_id: string;
     }
   | {
       type: ComponentType.ACTION_ROW;
