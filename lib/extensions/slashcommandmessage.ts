@@ -18,7 +18,6 @@ import {
   UserResolvable,
   RoleResolvable,
   MessageOptions,
-  MessageManager,
   SnowflakeUtil,
   InviteOptions,
   MessageEmbed,
@@ -295,7 +294,7 @@ export class SlashCommandMessage {
       | MessageEmbed
       | APIMessage,
     options?: (MessageEditOptions | MessageEmbed) & {
-      buttons?: APIComponent[];
+      components?: APIComponent[];
     }
   ) {
     let apiMessage: APIMessage;
@@ -323,23 +322,7 @@ export class SlashCommandMessage {
       files: any[];
     };
 
-    const isRow =
-      options?.buttons?.length &&
-      options?.buttons.every(
-        (component) => component.type == ComponentType.ACTION_ROW
-      );
-    const isButtons =
-      options?.buttons?.length &&
-      options?.buttons.every(
-        (component) => component.type == ComponentType.BUTTON
-      );
-
-    if (isRow) data.components = options.buttons;
-    else if (isButtons)
-      data.components = [
-        { type: ComponentType.ACTION_ROW, components: options.buttons },
-      ];
-    else if (options?.buttons == null) data.components = [];
+    data.components = this.client.util.validateComponents(options.components)
 
     await this.client.req
       .webhooks(this.client.user.id, this.slashCommand.token)
@@ -477,7 +460,7 @@ export class FakeChannel {
   async send(
     content: StringResolvable | APIMessage | MessageEmbed,
     options?: (MessageOptions | MessageAdditions) & {
-      buttons?: ActionRow[] | APIComponent[];
+      components?: ActionRow[] | APIComponent[];
     },
     flags?: number // Used for success/error, can also be set
   ): Promise<SlashCommandMessage> {
@@ -506,20 +489,7 @@ export class FakeChannel {
       files: any[];
     };
 
-    const isRow =
-      options?.buttons?.length &&
-      options?.buttons.every(
-        (component) => component.type == ComponentType.ACTION_ROW
-      );
-    const isButtons =
-      options?.buttons?.length &&
-      options?.buttons.every(
-        (component) => component.type == ComponentType.BUTTON
-      );
-
-    if (isRow) data.components = options.buttons;
-    else if (isButtons)
-      data.components = [{ type: 1, components: options.buttons }];
+    data.components = this.client.util.validateComponents(options.components)
 
     data.flags = this.flags;
     if (typeof flags == "number") data.flags = flags;

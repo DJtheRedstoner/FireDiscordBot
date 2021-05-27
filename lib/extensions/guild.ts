@@ -30,8 +30,8 @@ import { GuildSettings } from "@fire/lib/util/settings";
 import { getIDMatch } from "@fire/lib/util/converters";
 import { GuildLogManager } from "../util/logmanager";
 import { MessageIterator } from "../util/iterators";
-import { FakeChannel } from "./slashCommandMessage";
-import { ButtonMessage } from "./buttonMessage";
+import { FakeChannel } from "./slashcommandmessage";
+import { ComponentMessage } from "./componentmessage";
 import { FireTextChannel } from "./textchannel";
 import Semaphore from "semaphore-async-await";
 import { APIGuild } from "discord-api-types";
@@ -845,10 +845,10 @@ export class FireGuild extends Guild {
     let opener: FireMessage;
     if (alert && !author.isModerator()) {
       if (this.hasExperiment(1621199146, 1))
-        ButtonMessage.sendWithButtons(ticket, alert.toString(), {
+        ComponentMessage.sendWithComponents(ticket, alert.toString(), {
           allowedMentions: { roles: [alertId] },
           embed,
-          buttons: [
+          components: [
             {
               type: ComponentType.BUTTON,
               style: ButtonStyle.DESTRUCTIVE,
@@ -867,8 +867,8 @@ export class FireGuild extends Guild {
           .catch(() => {})) as FireMessage;
     } else {
       if (this.hasExperiment(1621199146, 1))
-        ButtonMessage.sendWithButtons(ticket, embed, {
-          buttons: [
+        ComponentMessage.sendWithComponents(ticket, embed, {
+          components: [
             {
               type: 2,
               style: ButtonStyle.DESTRUCTIVE,

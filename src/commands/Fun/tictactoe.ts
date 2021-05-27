@@ -4,8 +4,8 @@ import {
   ButtonStyle,
   ComponentType,
 } from "@fire/lib/interfaces/interactions";
-import { SlashCommandMessage } from "@fire/lib/extensions/slashCommandMessage";
-import { ButtonMessage } from "@fire/lib/extensions/buttonMessage";
+import { SlashCommandMessage } from "@fire/lib/extensions/slashcommandmessage";
+import { ComponentMessage } from "@fire/lib/extensions/componentmessage";
 import { FireMember } from "@fire/lib/extensions/guildmember";
 import { FireMessage } from "@fire/lib/extensions/message";
 import { SnowflakeUtil, Collection } from "discord.js";
@@ -97,7 +97,7 @@ export default class TicTacToe extends Command {
             ),
             requestMsgOptions
           )
-        : await ButtonMessage.sendWithButtons(
+        : await ComponentMessage.sendWithComponents(
             message.channel,
             message.guild.language.get(
               "TICTACTOE_GAME_REQUEST",
@@ -116,7 +116,7 @@ export default class TicTacToe extends Command {
             "TICTACTOE_REQUEST_EXPIRED_SLASH",
             opponent.toMention()
           ),
-          { buttons: null }
+          { components: null }
         );
       return await message.error("TICTACTOE_REQUEST_EXPIRED");
     } else
@@ -160,13 +160,13 @@ export default class TicTacToe extends Command {
       this.client.buttonHandlers.delete(`${gameId}:forfeit`);
       this.games.delete(gameId);
 
-      return await ButtonMessage.editWithButtons(
+      return await ComponentMessage.editWithComponents(
         buttonMessage,
         button.guild.language.get(
           "TICTACTOE_FORFEITED",
           button.member?.toMention()
         ),
-        { buttons: null }
+        { components: null }
       ).catch(() => {});
     });
 
@@ -217,14 +217,14 @@ export default class TicTacToe extends Command {
       },
     ] as ActionRow[];
 
-    return await ButtonMessage.sendWithButtons(
+    return await ComponentMessage.sendWithComponents(
       // followups are dumb and reply to the original message so fuck 'em
       message instanceof SlashCommandMessage
         ? message.realChannel
         : message.channel,
       message.guild.language.get("TICTACTOE_GAME_START", opponent.toMention()),
       {
-        buttons,
+        components: buttons,
         allowedMentions: { users: [opponent.id, message.author.id] },
       }
     );
@@ -239,7 +239,7 @@ export default class TicTacToe extends Command {
       setTimeout(() => {
         if (!resolved) resolve(false);
       }, 60000);
-      const handler = (button: ButtonMessage) => {
+      const handler = (button: ComponentMessage) => {
         if (button.author.id == opponent.id) resolve(true);
       };
       this.client.buttonHandlers.set(requestId, handler);
@@ -279,7 +279,7 @@ export default class TicTacToe extends Command {
   }
 
   private getGameHandler(gameId: string) {
-    return async (button: ButtonMessage) => {
+    return async (button: ComponentMessage) => {
       if (button.ephemeral) return;
       const buttonMessage = button.message as FireMessage;
       const game = this.games.get(gameId);
@@ -390,7 +390,7 @@ export default class TicTacToe extends Command {
               button.member?.toMention()
             ),
             {
-              buttons: components.slice(0, -1),
+              components: components.slice(0, -1),
             }
           )
           .catch(() => {});
@@ -417,7 +417,7 @@ export default class TicTacToe extends Command {
 
         return await button.channel
           .update(button.guild.language.get("TICTACTOE_DRAW"), {
-            buttons: components.slice(0, -1),
+            components: components.slice(0, -1),
           })
           .catch(() => {});
       }
@@ -426,7 +426,7 @@ export default class TicTacToe extends Command {
         .update(
           button.guild.language.get("TICTACTOE_TURN", `<@!${game.current}>`),
           {
-            buttons: components,
+            components: components,
           }
         )
         .catch(() => {});

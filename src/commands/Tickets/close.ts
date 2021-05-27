@@ -9,9 +9,9 @@ import {
   MessageOptions,
   Permissions,
 } from "discord.js";
-import { SlashCommandMessage } from "@fire/lib/extensions/slashCommandMessage";
+import { SlashCommandMessage } from "@fire/lib/extensions/slashcommandmessage";
 import { FireTextChannel } from "@fire/lib/extensions/textchannel";
-import { ButtonMessage } from "@fire/lib/extensions/buttonMessage";
+import { ComponentMessage } from "@fire/lib/extensions/componentmessage";
 import { FireMessage } from "@fire/lib/extensions/message";
 import { constants } from "@fire/lib/util/constants";
 import { Language } from "@fire/lib/util/language";
@@ -69,7 +69,7 @@ export default class CloseTicket extends Command {
         buttonOptions
       );
     } else if (message.guild.hasExperiment(1621199146, 1))
-      await ButtonMessage.sendWithButtons(
+      await ComponentMessage.sendWithComponents(
         message.channel,
         `${emojis.error} ${message.language.get("TICKET_WILL_CLOSE_BUTTON")}`,
         buttonOptions

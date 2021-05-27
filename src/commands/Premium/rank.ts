@@ -1,10 +1,10 @@
-import { SlashCommandMessage } from "@fire/lib/extensions/slashCommandMessage";
+import { SlashCommandMessage } from "@fire/lib/extensions/slashcommandmessage";
 import {
   APIComponent,
   ButtonStyle,
   ComponentType,
 } from "@fire/lib/interfaces/interactions";
-import { ButtonMessage } from "@fire/lib/extensions/buttonMessage";
+import { ComponentMessage } from "@fire/lib/extensions/componentmessage";
 import { FireMember } from "@fire/lib/extensions/guildmember";
 import { MessageEmbed, Permissions, Role } from "discord.js";
 import { FireMessage } from "@fire/lib/extensions/message";
@@ -94,9 +94,9 @@ export default class Rank extends Command {
         // message instanceof FireMessage
       );
       return message instanceof SlashCommandMessage
-        ? message.channel.send(embed, { buttons: components as APIComponent[] })
-        : await ButtonMessage.sendWithButtons(message.channel, embed, {
-            buttons: components as APIComponent[],
+        ? message.channel.send(embed, { components: components as APIComponent[] })
+        : await ComponentMessage.sendWithComponents(message.channel, embed, {
+            components: components as APIComponent[],
           });
     }
 

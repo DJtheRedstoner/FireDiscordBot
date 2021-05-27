@@ -6,6 +6,11 @@ import {
   Snowflake,
   Webhook,
 } from "discord.js";
+import {
+  ActionRow,
+  APIComponent,
+  ComponentType,
+} from "../interfaces/interactions";
 import { Channel, Video } from "@fire/lib/interfaces/youtube";
 import { FireMember } from "@fire/lib/extensions/guildmember";
 import { FireTextChannel } from "../extensions/textchannel";
@@ -121,6 +126,86 @@ export class Util extends ClientUtil {
       if (!fallback) return await this.haste(text, true, language);
       else throw e;
     }
+  }
+
+  validateComponents(
+    components: ActionRow[] | APIComponent[],
+    includeRow: boolean = true
+  ) {
+    let finalComponents: APIComponent[] = [];
+
+    const isRow = components.every(
+      (value) => value.type == ComponentType.ACTION_ROW
+    );
+    if (isRow)
+      finalComponents = components.map((row: ActionRow) =>
+        this.validateRow(row)
+      );
+    else {
+      const rows: ActionRow[] = [];
+      let currentRow = {
+        type: ComponentType.ACTION_ROW,
+        components: [],
+      } as ActionRow;
+      for (const component of components) {
+        if (rows.length >= 5) break;
+        if (
+          component.type == ComponentType.BUTTON ||
+          component.type == ComponentType.SELECT
+        )
+          currentRow.components.push(component);
+        if (
+          currentRow.components[0].type == ComponentType.SELECT ||
+          currentRow.components.length == 5
+        ) {
+          rows.push({ ...currentRow }); // push a copy
+          currentRow.components = [];
+        }
+      }
+
+      finalComponents = includeRow
+        ? rows.map((row: ActionRow) => this.validateRow(row))
+        : rows.flatMap((row: ActionRow) => row.components);
+    }
+
+    // the ternary is solely for typing
+    return includeRow
+      ? (finalComponents as ActionRow[])
+      : (finalComponents as APIComponent[]);
+  }
+
+  validateRow(row: ActionRow) {
+    if (
+      row.components.find((c) => c.type == ComponentType.SELECT) &&
+      row.components.length > 1
+    )
+      row.components = [
+        row.components.find((c) => c.type == ComponentType.SELECT),
+      ];
+
+    if (
+      row.components.every((c) => c.type == ComponentType.BUTTON) &&
+      row.components.length > 5
+    )
+      row.components = row.components.slice(0, 5);
+
+    for (const [index, component] of row.components.entries()) {
+      if (component.type == ComponentType.SELECT)
+        row.components[index] = this.validateDropdown(component);
+    }
+
+    return row;
+  }
+
+  validateDropdown(select: APIComponent) {
+    if (select.type != ComponentType.SELECT) return null;
+
+    if (select.min_values > select.max_values)
+      select.min_values = select.max_values;
+    else if (select.max_values > select.options.length)
+      select.max_values = select.options.length;
+
+    return select;
   }
 
   async nameToUUID(player: string) {
@@ -327,7 +412,8 @@ export class Util extends ClientUtil {
     if (this.plonked.includes(user)) return true;
 
     // guild blacklist
-    if (guild?.settings.get<string[]>("utils.plonked", []).includes(user)) return true;
+    if (guild?.settings.get<string[]>("utils.plonked", []).includes(user))
+      return true;
 
     return false;
   }

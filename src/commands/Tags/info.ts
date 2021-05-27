@@ -4,13 +4,13 @@ import {
   ButtonStyle,
   ComponentType,
 } from "@fire/lib/interfaces/interactions";
-import { ButtonMessage } from "@fire/lib/extensions/buttonMessage";
+import { ComponentMessage } from "@fire/lib/extensions/componentmessage";
 import { FireMessage } from "@fire/lib/extensions/message";
 import { MessageEmbed, Permissions } from "discord.js";
 import { Tag } from "@fire/lib/util/guildtagmanager";
 import { Language } from "@fire/lib/util/language";
 import { Command } from "@fire/lib/util/command";
-import { SlashCommandMessage } from "@fire/lib/extensions/slashCommandMessage";
+import { SlashCommandMessage } from "@fire/lib/extensions/slashcommandmessage";
 
 export default class TagInfo extends Command {
   constructor() {
@@ -74,10 +74,10 @@ export default class TagInfo extends Command {
       return message instanceof SlashCommandMessage
         ? await message.channel.send(null, {
             embed,
-            buttons: this.getInitialButtons(message, cachedTag),
+            components: this.getInitialButtons(message, cachedTag),
           })
-        : await ButtonMessage.sendWithButtons(message.channel, embed, {
-            buttons: this.getInitialButtons(message, cachedTag),
+        : await ComponentMessage.sendWithComponents(message.channel, embed, {
+            components: this.getInitialButtons(message, cachedTag),
           });
     else return await message.channel.send(embed);
   }

@@ -2,7 +2,7 @@ import {
   MessageLinkMatch,
   PartialQuoteDestination,
 } from "@fire/lib/interfaces/messages";
-import { SlashCommandMessage } from "@fire/lib/extensions/slashCommandMessage";
+import { SlashCommandMessage } from "@fire/lib/extensions/slashcommandmessage";
 import { FireTextChannel } from "@fire/lib/extensions/textchannel";
 import { FireMember } from "@fire/lib/extensions/guildmember";
 import { MessageUtil } from "@fire/lib/ws/util/MessageUtil";

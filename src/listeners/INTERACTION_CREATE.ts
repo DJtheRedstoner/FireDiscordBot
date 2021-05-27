@@ -1,8 +1,8 @@
 // The case of the file name is just to signify that
 // this is listening to an event directly from the gateway
 
-import { Button, Interaction } from "@fire/lib/interfaces/interactions";
-import { ButtonMessage } from "@fire/lib/extensions/buttonMessage";
+import { ComponentInteraction, Interaction } from "@fire/lib/interfaces/interactions";
+import { ComponentMessage } from "@fire/lib/extensions/componentmessage";
 import { FireGuild } from "@fire/lib/extensions/guild";
 import { constants } from "@fire/lib/util/constants";
 import { Listener } from "@fire/lib/util/listener";
@@ -23,7 +23,7 @@ export default class InteractionCreate extends Listener {
     if (this.blacklistCheck(interaction)) return;
     // slash command, use client interaction event
     else if (interaction.type == 2) return;
-    else if (interaction.type == 3) return await this.handleButton(interaction);
+    else if (interaction.type == 3) return await this.handleComponent(interaction);
     else {
       const haste = await this.client.util.haste(
         JSON.stringify(interaction, null, 4),
@@ -41,11 +41,11 @@ export default class InteractionCreate extends Listener {
     }
   }
 
-  async handleButton(button: Button) {
+  async handleComponent(button: ComponentInteraction) {
     try {
       // should be cached if in guild or fetch if dm channel
       await this.client.channels.fetch(button.channel_id).catch(() => {});
-      const message = new ButtonMessage(this.client, button);
+      const message = new ComponentMessage(this.client, button);
       if (!message.custom_id.startsWith("!")) await message.channel.ack();
       else message.custom_id = message.custom_id.slice(1);
       this.client.emit("button", message);

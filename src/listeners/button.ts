@@ -1,7 +1,7 @@
 import {
-  ButtonMessage,
+  ComponentMessage,
   EphemeralMessage,
-} from "@fire/lib/extensions/buttonMessage";
+} from "@fire/lib/extensions/componentmessage";
 import {
   APIComponent,
   ButtonStyle,
@@ -36,10 +36,10 @@ export default class Button extends Listener {
   }
 
   // used to handle generic buttons, like ticket close or reaction roles
-  async exec(button: ButtonMessage) {
+  async exec(button: ComponentMessage) {
     // check for deletion button
     if (button.custom_id == "delete_me")
-      return await button.delete(button.button.message.id).catch(() => {});
+      return await button.delete(button.interaction.message.id).catch(() => {});
 
     let message: FireMessage;
     if (!button.ephemeral) message = button.message as FireMessage;
@@ -177,7 +177,7 @@ export default class Button extends Listener {
         );
       await button.channel.update(null, {
         embed,
-        buttons: components as APIComponent[],
+        components: components as APIComponent[],
       });
     }
 
@@ -210,11 +210,11 @@ export default class Button extends Listener {
           .setColor(button.member?.displayHexColor || "#ffffff")
           .setDescription(button.language.get("TAG_EDIT_BUTTON_CANCEL_EMBED"))
           .setTimestamp();
-        return ButtonMessage.editWithButtons(
+        return ComponentMessage.editWithComponents(
           button.message as FireMessage,
           cancelledEmbed,
           {
-            buttons: null,
+            components: null,
           }
         );
       });
@@ -227,7 +227,7 @@ export default class Button extends Listener {
         .setDescription(button.language.get("TAG_EDIT_BUTTON_EMBED"))
         .setTimestamp();
       await button.channel.update(editEmbed, {
-        buttons: [
+        components: [
           {
             label: button.language.get("TAG_EDIT_CANCEL_BUTTON") as string,
             style: ButtonStyle.DESTRUCTIVE,
@@ -241,7 +241,7 @@ export default class Button extends Listener {
         .awaitMessages(
           (m: FireMessage) =>
             m.author.id == button.author.id &&
-            m.channel.id == button.button.channel_id,
+            m.channel.id == button.interaction.channel_id,
           { max: 1, time: 150000, errors: ["time"] }
         )
         .catch(() => {});
@@ -257,11 +257,11 @@ export default class Button extends Listener {
           .setColor(button.member?.displayHexColor || "#ffffff")
           .setDescription(button.language.get("TAG_EDIT_BUTTON_EDITING_EMBED"))
           .setTimestamp();
-        await ButtonMessage.editWithButtons(
+        await ComponentMessage.editWithComponents(
           button.message as FireMessage,
           editingEmbed,
           {
-            buttons: null,
+            components: null,
           }
         ).catch(() => {});
       }
@@ -316,7 +316,7 @@ export default class Button extends Listener {
       if (!deleted)
         return await button.channel.update(
           button.language.get("TAG_DELETE_FAILED", data),
-          { embed: null, buttons: null }
+          { embed: null, components: null }
         );
       else {
         const embed = new MessageEmbed()
@@ -327,7 +327,7 @@ export default class Button extends Listener {
           .setColor(button.member?.displayHexColor || "#ffffff")
           .setDescription(button.language.get("TAG_DELETE_SUCCESS", data))
           .setTimestamp();
-        return await button.channel.update(embed, { buttons: null });
+        return await button.channel.update(embed, { components: null });
       }
     }
 
@@ -378,14 +378,14 @@ export default class Button extends Listener {
       this.client.buttonHandlersOnce.set(deleteSnowflake, () => {
         button
           .edit(button.language.get("SK1ER_SUPPORT_CANCELLED"), {
-            buttons: null,
+            components: null,
           })
           .catch(() => {});
       });
       await button.channel.send(
         button.language.get("SK1ER_SUPPORT_CONFIRM"),
         {
-          buttons: [confirmButton, deleteButton],
+          components: [confirmButton, deleteButton],
         },
         64
       );
@@ -395,7 +395,7 @@ export default class Button extends Listener {
       // user has not clicked delete button
       if (this.client.buttonHandlersOnce.has(deleteSnowflake))
         await button.edit(button.language.get("SK1ER_SUPPORT_CONFIRM_EDIT"), {
-          buttons: [confirmButton, deleteButton],
+          components: [confirmButton, deleteButton],
         });
     } else if (button.custom_id.startsWith("sk1er_confirm_")) {
       const type = button.custom_id.slice(14);

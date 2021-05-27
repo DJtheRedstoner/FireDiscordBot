@@ -10,7 +10,7 @@ import {
 import {
   FakeChannel,
   SlashCommandMessage,
-} from "@fire/lib/extensions/slashCommandMessage";
+} from "@fire/lib/extensions/slashcommandmessage";
 import {
   APIComponent,
   ButtonStyle,
@@ -18,7 +18,7 @@ import {
 } from "../interfaces/interactions";
 import { FireTextChannel } from "@fire/lib/extensions/textchannel";
 import { FireMember } from "@fire/lib/extensions/guildmember";
-import { ButtonMessage } from "../extensions/buttonMessage";
+import { ComponentMessage } from "../extensions/componentmessage";
 import { FireMessage } from "@fire/lib/extensions/message";
 import { FireUser } from "@fire/lib/extensions/user";
 import Semaphore from "semaphore-async-await";
@@ -183,7 +183,7 @@ export class PaginatorInterface {
     emoji: EmojiResolvable,
     users: ReactionUserManager
   ) => Promise<void>;
-  buttonHandler: (button: ButtonMessage) => Promise<any>;
+  buttonHandler: (button: ComponentMessage) => Promise<any>;
 
   constructor(
     bot: Fire,
@@ -250,7 +250,7 @@ export class PaginatorInterface {
       ).catch(() => {});
     };
 
-    this.buttonHandler = async (button: ButtonMessage) => {
+    this.buttonHandler = async (button: ComponentMessage) => {
       if (button.custom_id == "close")
         return (
           this.deleteMessage && (await this.message.delete().catch(() => {}))
@@ -332,14 +332,14 @@ export class PaginatorInterface {
         | SlashCommandMessage;
     else if (destination instanceof FakeChannel)
       message = await destination.send(this.sendArgs, {
-        buttons: this.getButtons(),
+        components: this.getButtons(),
       });
     else
-      message = (await ButtonMessage.sendWithButtons(
+      message = (await ComponentMessage.sendWithComponents(
         destination,
         this.sendArgs,
         {
-          buttons: this.getButtons(),
+          components: this.getButtons(),
         }
       ).catch(() => {})) as FireMessage;
     if (message instanceof SlashCommandMessage) {
@@ -445,10 +445,10 @@ export class PaginatorInterface {
       )
         this.slashMessage
           ? this.slashMessage.edit(this.sendArgs, {
-              buttons: this.getButtons(),
+              components: this.getButtons(),
             })
-          : await ButtonMessage.editWithButtons(this.message, this.sendArgs, {
-              buttons: this.getButtons(),
+          : await ComponentMessage.editWithComponents(this.message, this.sendArgs, {
+              components: this.getButtons(),
             });
       else {
         if (!this.sentPageReactions) this.sendAllReactions();

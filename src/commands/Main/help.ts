@@ -4,8 +4,8 @@ import {
   GuildChannel,
   Permissions,
 } from "discord.js";
-import { SlashCommandMessage } from "@fire/lib/extensions/slashCommandMessage";
-import { ButtonMessage } from "@fire/lib/extensions/buttonMessage";
+import { SlashCommandMessage } from "@fire/lib/extensions/slashcommandmessage";
+import { ComponentMessage } from "@fire/lib/extensions/componentmessage";
 import { FireMessage } from "@fire/lib/extensions/message";
 import VanityURLs from "@fire/src/modules/vanityurls";
 import { titleCase } from "@fire/lib/util/constants";
@@ -180,9 +180,9 @@ export default class Help extends Command {
       timestamp: new Date(),
     };
     return message instanceof SlashCommandMessage
-      ? await message.channel.send(null, { embed, buttons })
-      : await ButtonMessage.sendWithButtons(message.channel, null, {
-          buttons,
+      ? await message.channel.send(null, { embed, components: buttons })
+      : await ComponentMessage.sendWithComponents(message.channel, null, {
+          components: buttons,
           embed,
         });
   }

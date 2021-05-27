@@ -36,7 +36,7 @@ export interface SlashCommand {
   type: 2;
 }
 
-export interface Button {
+export interface ComponentInteraction {
   member?: APIGuildMember;
   application_id: string;
   data: ComponentData;
@@ -119,8 +119,9 @@ export interface ApplicationCommandPermissions {
 }
 
 export interface ComponentData {
-  component_type: number;
+  component_type: ComponentType.BUTTON | ComponentType.SELECT;
   custom_id: string;
+  values?: string[];
 }
 
 export enum ButtonStyle {
@@ -213,7 +214,10 @@ export type APIComponent =
       type: ComponentType.SELECT;
       options: SelectOption[];
       placeholder: string;
+      disabled?: boolean; // doesn't seem to affect dropdowns but tsc complains without
       custom_id: string;
+      min_values?: number;
+      max_values?: number;
     }
   | {
       type: ComponentType.ACTION_ROW;

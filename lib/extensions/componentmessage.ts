@@ -29,7 +29,7 @@ import {
   APIComponent,
   Interaction,
   ComponentType,
-  Button,
+  ComponentInteraction,
   ActionRow,
 } from "../interfaces/interactions";
 import { APIMessage as DiscordAPIMessage } from "discord-api-types";
@@ -45,11 +45,12 @@ import { Fire } from "../Fire";
 const { emojis, reactions } = constants;
 export type EphemeralMessage = { id: string; flags: number };
 
-export class ButtonMessage {
+export class ComponentMessage {
   realChannel?: FireTextChannel | NewsChannel | DMChannel;
   private snowflake: DeconstructedSnowflake;
   message: FireMessage | EphemeralMessage;
   sent: false | "ack" | "message";
+  interaction: ComponentInteraction;
   sourceMessage: FireMessage;
   private _flags: number;
   latestResponse: string;
@@ -60,58 +61,60 @@ export class ButtonMessage {
   custom_id: string;
   guild: FireGuild;
   author: FireUser;
-  button: Button;
   client: Fire;
   id: string;
 
-  constructor(client: Fire, button: Interaction) {
-    if (button.type != 3) throw new TypeError("Interaction is not Button");
+  constructor(client: Fire, interaction: Interaction) {
+    if (interaction.type != 3)
+      throw new TypeError("Interaction is not MessageComponent");
     this.client = client;
-    this.id = button.id;
+    this.id = interaction.id;
     this.snowflake = SnowflakeUtil.deconstruct(this.id);
-    this.custom_id = button.data.custom_id;
-    this.button = button;
+    this.custom_id = interaction.data.custom_id;
+    this.interaction = interaction;
     this.sent = false;
-    this.guild = client.guilds.cache.get(button.guild_id) as FireGuild;
-    this.realChannel = client.channels.cache.get(button.channel_id) as
+    this.guild = client.guilds.cache.get(interaction.guild_id) as FireGuild;
+    this.realChannel = client.channels.cache.get(interaction.channel_id) as
       | FireTextChannel
       | NewsChannel
       | DMChannel;
-    this.ephemeral = (button.message.flags & 64) != 0;
+    this.ephemeral = (interaction.message.flags & 64) != 0;
     this.message = this.ephemeral
-      ? (button.message as EphemeralMessage)
+      ? (interaction.message as EphemeralMessage)
       : (this.realChannel.messages.cache.get(
-          button.message?.id
+          interaction.message?.id
         ) as FireMessage) ||
-        new FireMessage(client, button.message, this.realChannel);
+        new FireMessage(client, interaction.message, this.realChannel);
     if (
       !this.message ||
       (!this.ephemeral &&
-        !this.button.message.components?.find(
+        !this.interaction.message.components?.find(
           (component) =>
-            (component.type == this.button.data.component_type &&
+            (component.type == this.interaction.data.component_type &&
               // @ts-ignore
               component.custom_id == this.custom_id) ||
             (component.type == ComponentType.ACTION_ROW &&
               component.components.find(
                 (component) =>
-                  component.type == this.button.data.component_type &&
+                  component.type == this.interaction.data.component_type &&
                   // @ts-ignore
                   component.custom_id == this.custom_id
               ))
         ))
     )
       throw new Error("Component checks failed, potential mitm/selfbot?");
-    if (button.member)
+    if (interaction.member)
       this.member =
-        (this.guild.members.cache.get(button.member.user.id) as FireMember) ||
-        new FireMember(client, button.member, this.guild);
-    this.author = button.user
-      ? (client.users.cache.get(button.user.id) as FireUser) ||
-        new FireUser(client, button.user)
-      : button.member &&
-        ((client.users.cache.get(button.member.user.id) as FireUser) ||
-          new FireUser(client, button.member.user));
+        (this.guild.members.cache.get(
+          interaction.member.user.id
+        ) as FireMember) ||
+        new FireMember(client, interaction.member, this.guild);
+    this.author = interaction.user
+      ? (client.users.cache.get(interaction.user.id) as FireUser) ||
+        new FireUser(client, interaction.user)
+      : interaction.member &&
+        ((client.users.cache.get(interaction.member.user.id) as FireUser) ||
+          new FireUser(client, interaction.member.user));
     this.language = this.author?.settings.has("utils.language")
       ? this.author.language.id == "en-US" && this.guild?.language.id != "en-US"
         ? this.guild?.language
@@ -121,27 +124,27 @@ export class ButtonMessage {
       this.channel = new FakeChannel(
         this,
         client,
-        button.id,
-        button.token,
-        button.guild_id ? null : this.author.dmChannel
+        interaction.id,
+        interaction.token,
+        interaction.guild_id ? null : this.author.dmChannel
       );
       return this;
     }
     this.channel = new FakeChannel(
       this,
       client,
-      button.id,
-      button.token,
+      interaction.id,
+      interaction.token,
       this.realChannel
     );
   }
 
   // temp helper function
-  static async sendWithButtons(
+  static async sendWithComponents(
     channel: FireTextChannel | NewsChannel | DMChannel | FireMessage,
     content: StringResolvable | APIMessage | MessageEmbed,
     options?: (MessageOptions | MessageAdditions) & {
-      buttons?: APIComponent[];
+      components?: APIComponent[];
     }
   ): Promise<FireMessage> {
     if (channel instanceof FireMessage) channel = channel.channel;
@@ -165,22 +168,7 @@ export class ButtonMessage {
       files: any[];
     };
 
-    const isRow =
-      options?.buttons?.length &&
-      options?.buttons.every(
-        (component) => component.type == ComponentType.ACTION_ROW
-      );
-    const isButtons =
-      options?.buttons?.length &&
-      options?.buttons.every(
-        (component) => component.type == ComponentType.BUTTON
-      );
-
-    if (isRow) data.components = options.buttons;
-    else if (isButtons)
-      data.components = [
-        { type: ComponentType.ACTION_ROW, components: options.buttons },
-      ];
+    data.components = (channel.client as Fire).util.validateComponents(options.components)
 
     return await (channel.client as Fire).req
       .channels(channel.id)
@@ -193,11 +181,11 @@ export class ButtonMessage {
   }
 
   // temp helper function
-  static async editWithButtons(
+  static async editWithComponents(
     message: FireMessage,
     content: StringResolvable | APIMessage | MessageEmbed,
     options?: (MessageOptions | MessageAdditions) & {
-      buttons?: ActionRow[] | APIComponent[];
+      components?: ActionRow[] | APIComponent[];
     }
   ) {
     let apiMessage: APIMessage;
@@ -224,21 +212,7 @@ export class ButtonMessage {
       files: any[];
     };
 
-    const isRow =
-      options?.buttons?.length &&
-      options?.buttons.every(
-        (component) => component.type == ComponentType.ACTION_ROW
-      );
-    const isButtons =
-      options?.buttons?.length &&
-      options?.buttons.every(
-        (component) => component.type == ComponentType.BUTTON
-      );
-
-    if (isRow) data.components = options.buttons;
-    else if (isButtons)
-      data.components = [{ type: 1, components: options.buttons }];
-    else if (options?.buttons == null) data.components = [];
+    data.components = message.client.util.validateComponents(options.components)
 
     return await (message.client as Fire).req
       .channels(message.channel.id)
@@ -294,7 +268,7 @@ export class ButtonMessage {
   success(
     key: string = "",
     ...args: any[]
-  ): Promise<ButtonMessage | MessageReaction | void> {
+  ): Promise<ComponentMessage | MessageReaction | void> {
     if (!key) {
       if (this.sourceMessage instanceof FireMessage)
         return this.sourceMessage.react(reactions.success).catch(() => {});
@@ -317,7 +291,7 @@ export class ButtonMessage {
   error(
     key: string = "",
     ...args: any[]
-  ): Promise<ButtonMessage | MessageReaction | void> {
+  ): Promise<ComponentMessage | MessageReaction | void> {
     if (!key) {
       if (this.sourceMessage instanceof FireMessage)
         return this.sourceMessage.react(reactions.error).catch(() => {});
@@ -344,7 +318,7 @@ export class ButtonMessage {
     let messageId = this.latestResponse;
     if (messageId == "@original") {
       const message = await this.client.req
-        .webhooks(this.client.user.id, this.button.token)
+        .webhooks(this.client.user.id, this.interaction.token)
         .messages(messageId)
         .get<DiscordAPIMessage>()
         .catch(() => {});
@@ -365,7 +339,7 @@ export class ButtonMessage {
       | MessageEmbed
       | APIMessage,
     options?: (MessageEditOptions | MessageEmbed) & {
-      buttons?: APIComponent[];
+      components?: APIComponent[];
     }
   ) {
     const { data } = (content instanceof APIMessage
@@ -378,24 +352,10 @@ export class ButtonMessage {
 
     data.flags = this.flags;
 
-    const isRow =
-      options?.buttons?.length &&
-      options?.buttons.every(
-        (component) => component.type == ComponentType.ACTION_ROW
-      );
-    const isButtons =
-      options?.buttons?.length &&
-      options?.buttons.every(
-        (component) => component.type == ComponentType.BUTTON
-      );
-
-    if (isRow) data.components = options.buttons;
-    else if (isButtons)
-      data.components = [{ type: 1, components: options.buttons }];
-    else if (options?.buttons == null) data.components = [];
+    data.components = this.client.util.validateComponents(options.components)
 
     await this.client.req
-      .webhooks(this.client.user.id, this.button.token)
+      .webhooks(this.client.user.id, this.interaction.token)
       .messages(this.latestResponse ?? "@original")
       .patch({
         data,
@@ -407,7 +367,7 @@ export class ButtonMessage {
   async delete(id?: string) {
     if (this.ephemeral) return;
     await this.client.req
-      .webhooks(this.client.user.id, this.button.token)
+      .webhooks(this.client.user.id, this.interaction.token)
       .messages(id ?? this.latestResponse ?? "@original")
       .delete()
       .catch(() => {});
@@ -425,13 +385,13 @@ export class ButtonMessage {
 export class FakeChannel {
   real: FireTextChannel | NewsChannel | DMChannel;
   messages: MessageManager;
-  message: ButtonMessage;
+  message: ComponentMessage;
   token: string;
   client: Fire;
   id: string;
 
   constructor(
-    message: ButtonMessage,
+    message: ComponentMessage,
     client: Fire,
     id: string,
     token: string,
@@ -518,10 +478,10 @@ export class FakeChannel {
   async send(
     content: StringResolvable | APIMessage | MessageEmbed,
     options?: (MessageOptions | MessageAdditions) & {
-      buttons?: APIComponent[];
+      components?: APIComponent[];
     },
     flags?: number // Used for success/error, can also be set
-  ): Promise<ButtonMessage> {
+  ): Promise<ComponentMessage> {
     let apiMessage: APIMessage;
 
     if (content instanceof MessageEmbed) {
@@ -547,22 +507,7 @@ export class FakeChannel {
       files: any[];
     };
 
-    const isRow =
-      options?.buttons?.length &&
-      options?.buttons.every(
-        (component) => component.type == ComponentType.ACTION_ROW
-      );
-    const isButtons =
-      options?.buttons?.length &&
-      options?.buttons.every(
-        (component) => component.type == ComponentType.BUTTON
-      );
-
-    if (isRow) data.components = options.buttons;
-    else if (isButtons)
-      data.components = [
-        { type: ComponentType.ACTION_ROW, components: options.buttons },
-      ];
+    data.components = this.client.util.validateComponents(options.components)
 
     data.flags = this.flags;
     if (typeof flags == "number") data.flags = flags;
@@ -608,10 +553,10 @@ export class FakeChannel {
   async update(
     content: StringResolvable | APIMessage | MessageEmbed,
     options?: (MessageOptions | MessageAdditions) & {
-      buttons?: APIComponent[];
+      components?: APIComponent[];
     },
     flags?: number // Used for success/error, can also be set
-  ): Promise<ButtonMessage> {
+  ): Promise<ComponentMessage> {
     if (this.message.sent) return; // can only update with initial response
 
     let apiMessage: APIMessage;
@@ -639,23 +584,7 @@ export class FakeChannel {
       files: any[];
     };
 
-    const isRow =
-      options?.buttons?.length &&
-      options?.buttons.every(
-        (component) => component.type == ComponentType.ACTION_ROW
-      );
-    const isButtons =
-      options?.buttons?.length &&
-      options?.buttons.every(
-        (component) => component.type == ComponentType.BUTTON
-      );
-
-    if (isRow) data.components = options.buttons;
-    else if (isButtons)
-      data.components = [
-        { type: ComponentType.ACTION_ROW, components: options.buttons },
-      ];
-    else if (options?.buttons == null) data.components = [];
+    data.components = this.client.util.validateComponents(options.components)
 
     data.flags = this.flags;
     if (typeof flags == "number") data.flags = flags;
