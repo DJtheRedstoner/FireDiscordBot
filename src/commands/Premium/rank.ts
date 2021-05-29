@@ -184,10 +184,9 @@ export default class Rank extends Command {
     roles = roles.map((id) => guild.roles.cache.get(id) as Role);
     const dropdown = {
       placeholder: guild.language.get("RANKS_SELECT_PLACEHOLDER"),
-      custom_id: `!rank:${guild.id}`,
+      custom_id: `rank:${guild.id}`,
       type: ComponentType.SELECT,
       max_values: roles.length,
-      min_values: 1,
       options: [],
     } as APIComponentSelect;
     for (const role of roles) {
