@@ -1136,12 +1136,42 @@ ${prefixes.join(", ")}`,
         RANKS_INFO: (role: string, members: string) =>
           `> ${role} (${members} members)`,
         RANKS_AUTHOR: (guild: string) => `${guild}'s ranks`,
+        RANKS_SELECT_NONE:
+          "You did not choose any valid ranks. You may need to re-run the command to get an updated list",
         RANKS_JOIN_REASON: "Joined rank",
         RANKS_JOIN_RANK: (role: string) =>
           `You successfully joined the **${role}** rank.`,
+        RANKS_SELECT_JOIN: (roles: string[]) =>
+          roles.length == 1
+            ? `You successfully joined the **${roles[0]}** rank.`
+            : `You successfully joined the ${roles
+                .map((name) => "**" + name + "**")
+                .join(", ")} ranks.`,
         RANKS_LEAVE_REASON: "Left rank",
         RANKS_LEFT_RANK: (role: string) =>
           `You successfully left the **${role}** rank.`,
+        RANKS_SELECT_LEAVE: (roles: string[]) =>
+          roles.length == 1
+            ? `You successfully left the **${roles[0]}** rank.`
+            : `You successfully left the ${roles
+                .map((name) => "**" + name + "**")
+                .join(", ")} ranks.`,
+        RANKS_SELECT_JOIN_LEAVE: (join: string[], leave: string[]) => {
+          if (join.length == 1 && leave.length == 1)
+            return `You successfully joined the **${join[0]}** rank and left the **${leave[0]}** rank.`;
+          else if (join.length == 1)
+            return `You successfully joined the **${
+              join[0]
+            }** rank and left the **${leave
+              .map((name) => "**" + name + "**")
+              .join(", ")}** ranks.`;
+          else
+            return `You successfully joined the ${join
+              .map((name) => "**" + name + "**")
+              .join(", ")} ranks and left the ${leave
+              .map((name) => "**" + name + "**")
+              .join(", ")}.`;
+        },
         RANKS_INVALID_ROLE:
           "That isn't a valid rank. Use the command without arguments to see a list of valid ranks",
         RANKS_INVALID_ROLE_DEL:
