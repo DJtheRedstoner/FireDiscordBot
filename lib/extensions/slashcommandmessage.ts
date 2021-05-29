@@ -322,7 +322,8 @@ export class SlashCommandMessage {
       files: any[];
     };
 
-    data.components = this.client.util.validateComponents(options.components)
+    if (options.components)
+      data.components = this.client.util.validateComponents(options.components);
 
     await this.client.req
       .webhooks(this.client.user.id, this.slashCommand.token)
@@ -489,7 +490,8 @@ export class FakeChannel {
       files: any[];
     };
 
-    data.components = this.client.util.validateComponents(options.components)
+    if (options.components)
+      data.components = this.client.util.validateComponents(options.components);
 
     data.flags = this.flags;
     if (typeof flags == "number") data.flags = flags;
