@@ -134,7 +134,7 @@ export class Util extends ClientUtil {
   ) {
     let finalComponents: APIComponent[] = [];
 
-    const isRow = components.every(
+    const isRow = components?.every(
       (value) => value.type == ComponentType.ACTION_ROW
     );
     if (isRow)
