@@ -118,10 +118,17 @@ export interface ApplicationCommandPermissions {
   permission: boolean; // true to allow, false, to disallow
 }
 
-export interface ComponentData {
-  component_type: ComponentType.BUTTON | ComponentType.SELECT;
+export type ComponentData = ButtonComponentData | SelectComponentData;
+
+interface ButtonComponentData {
+  component_type: ComponentType.BUTTON;
   custom_id: string;
-  values?: string[];
+}
+
+interface SelectComponentData {
+  component_type: ComponentType.SELECT;
+  custom_id: string;
+  values: string[];
 }
 
 export enum ButtonStyle {
@@ -162,8 +169,8 @@ export interface APIComponentSelect {
   placeholder: string;
   disabled?: boolean; // doesn't seem to affect dropdowns but tsc complains without
   custom_id: string;
-  min_values: number;
-  max_values: number;
+  min_values?: number;
+  max_values?: number;
 }
 
 export type APIComponent =
