@@ -26,10 +26,10 @@ import {
   DMChannel,
 } from "discord.js";
 import {
+  ComponentInteraction,
+  ComponentType,
   APIComponent,
   Interaction,
-  ComponentType,
-  ComponentInteraction,
   ActionRow,
 } from "../interfaces/interactions";
 import { APIMessage as DiscordAPIMessage } from "discord-api-types";
@@ -62,6 +62,7 @@ export class ComponentMessage {
   custom_id: string;
   guild: FireGuild;
   author: FireUser;
+  values: string[];
   client: Fire;
   id: string;
 
@@ -73,6 +74,9 @@ export class ComponentMessage {
     this.snowflake = SnowflakeUtil.deconstruct(this.id);
     this.type = interaction.data.component_type;
     this.custom_id = interaction.data.custom_id;
+    this.values = [];
+    if (interaction.data.component_type == ComponentType.SELECT)
+      this.values = interaction.data.values;
     this.interaction = interaction;
     this.sent = false;
     this.guild = client.guilds.cache.get(interaction.guild_id) as FireGuild;
@@ -170,9 +174,10 @@ export class ComponentMessage {
       files: any[];
     };
 
-    data.components = (channel.client as Fire).util.validateComponents(
-      options.components
-    );
+    if (options.components)
+      data.components = (channel.client as Fire).util.validateComponents(
+        options.components
+      );
 
     return await (channel.client as Fire).req
       .channels(channel.id)
@@ -216,9 +221,10 @@ export class ComponentMessage {
       files: any[];
     };
 
-    data.components = message.client.util.validateComponents(
-      options.components
-    );
+    if (options.components)
+      data.components = message.client.util.validateComponents(
+        options.components
+      );
 
     return await (message.client as Fire).req
       .channels(message.channel.id)
@@ -358,7 +364,8 @@ export class ComponentMessage {
 
     data.flags = this.flags;
 
-    data.components = this.client.util.validateComponents(options.components);
+    if (options.components)
+      data.components = this.client.util.validateComponents(options.components);
 
     await this.client.req
       .webhooks(this.client.user.id, this.interaction.token)
@@ -513,7 +520,8 @@ export class FakeChannel {
       files: any[];
     };
 
-    data.components = this.client.util.validateComponents(options.components);
+    if (options.components)
+      data.components = this.client.util.validateComponents(options.components);
 
     data.flags = this.flags;
     if (typeof flags == "number") data.flags = flags;
@@ -590,7 +598,8 @@ export class FakeChannel {
       files: any[];
     };
 
-    data.components = this.client.util.validateComponents(options.components);
+    if (options.components)
+      data.components = this.client.util.validateComponents(options.components);
 
     data.flags = this.flags;
     if (typeof flags == "number") data.flags = flags;
